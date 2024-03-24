@@ -1,0 +1,20 @@
+//Owned by Logesh 
+
+List<Report> reportLst = [SELECT Id,DeveloperName,Name FROM Report where DeveloperName ='Sales_Accounts_Report_dAd'];
+    for(Report report: reportLst){
+        String reportId = (String)report.Id;     
+        string reportName=(String)report.Name;     
+        ApexPages.PageReference objPage = new ApexPages.PageReference('/'+reportId+'?csv=1&isdtp=p1'); 
+                   
+        Messaging.EmailFileAttachment EmailAttach = new Messaging.EmailFileAttachment();
+        EmailAttach.setFileName(reportName+'.csv');
+        EmailAttach.setBody(objPage.getContent());
+        EmailAttach.setContentType('text/csv');
+        attachments.add(EmailAttach); }
+ List<Messaging.EmailFileAttachment> attachments=new List<Messaging.EmailFileAttachment>(); 
+ Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+ mail.setToAddresses(new List<String>{'youremail@gmail.com'});
+ mail.setSubject('Sales Accounts Report from Salesforce');
+ mail.setHtmlBody('<br/><br/>Please review the attached Sales Accounts Report.<br/><br/>');
+ mail.setFileAttachments(attachments);
+ Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
