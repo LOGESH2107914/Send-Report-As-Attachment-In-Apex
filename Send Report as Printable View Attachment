@@ -1,0 +1,21 @@
+List<Messaging.EmailFileAttachment> attachments=new List<Messaging.EmailFileAttachment>();
+ List<Report>reportLst = [SELECT Id,DeveloperName,Name FROM Report where DeveloperName ='Sales_Accounts_Report_dAd'];
+ if(reportLst.size()>0){
+    for(Report report:reportLst){
+        String reportId = (String)report.Id;     
+        string reportName=(String)report.Name;     
+        ApexPages.PageReference objPage = new ApexPages.PageReference('/servlet/PrintableViewDownloadServlet?isdtp=p1&reportId='+reportId); 
+                   
+        Messaging.EmailFileAttachment EmailAttach = new Messaging.EmailFileAttachment();
+        EmailAttach.setFileName(reportName+'.csv');
+        EmailAttach.setBody(objPage.getContent());
+        EmailAttach.setContentType('text/csv');
+        attachments.add(EmailAttach);
+    }
+ }  
+ Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+ mail.setToAddresses(new List<String>{'youremail@gmail.com'});
+  mail.setSubject('Sales Accounts Report from Salesforce');
+ mail.setHtmlBody('<br/><br/>Please review the attached Sales Accounts Report.<br/><br/>');
+ mail.setFileAttachments(attachments);
+ Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
